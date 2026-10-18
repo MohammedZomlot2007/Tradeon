@@ -93,7 +93,7 @@ jobs:
           BROADCAST_CONNECTION: log
         run: |
           set -o pipefail
-          php artisan test --no-interaction 2>&1 | tee artifacts/phpunit.log
+          php artisan test 2>&1 | tee artifacts/phpunit.log
 
       - name: Run application smoke checks
         shell: bash
