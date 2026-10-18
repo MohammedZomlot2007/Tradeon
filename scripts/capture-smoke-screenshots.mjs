@@ -57,7 +57,7 @@ try {
   await page.locator('#password').fill('Tradeon-CI-Demo-2026!');
   await page.locator('#password_confirmation').fill('Tradeon-CI-Demo-2026!');
 
-  await page.locator('form button[type="submit"]').click();
+  await page.getByRole('button', { name: /continue/i }).click();
   await page.waitForFunction(
     () => window.location.pathname.endsWith('/onboarding/company'),
     null,
@@ -75,7 +75,7 @@ try {
   await page.locator('#country').fill('United States');
   await page.locator('#city').fill('Austin');
   await page.locator('#description').fill('Synthetic company record created only in the disposable CI database to verify onboarding and the business feed interface.');
-  await page.locator('form button[type="submit"]').click();
+  await page.getByRole('button', { name: /create company profile/i }).click();
   await page.waitForFunction(
     () => !window.location.pathname.endsWith('/onboarding/company'),
     null,
