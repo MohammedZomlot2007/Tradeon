@@ -87,10 +87,10 @@ try {
 
   // Publish a fictional post through the real browser UI, so the feed screenshot
   // shows a product card rendered from the test database rather than a mockup.
-  await page.getByRole('button', { name: /create business post/i }).click({ timeout: 15_000 });
+  await page.getByRole('button', { name: 'Create business post', exact: true }).click({ timeout: 15_000 });
   const dialog = page.getByRole('dialog');
   await dialog.locator('select').selectOption('business_update');
-  await dialog.locator('input[type="text"]').fill('CI Demo — supplier partnership update');
+  await dialog.locator('input[type="text"]').first().fill('CI Demo — supplier partnership update');
   await dialog.locator('textarea').fill('Fictional QA content: Tradeon is validating its company feed, business updates, and sourcing workflows in a disposable test environment. No real companies or customers are represented.');
   await dialog.getByRole('button', { name: /publish post/i }).click();
 
