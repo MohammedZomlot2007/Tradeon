@@ -12,12 +12,24 @@ MySQL (prod) · Redis (prod) · Reverb · Paddle · Pest.
 ## Product presentation
 
 ### Product preview
-- **Static introduction:** [Open the Tradeon project landing page](https://mohammedzomlot2007.github.io/Tradeon/)
-- **Full source repository:** [MohammedZomlot2007/Tradeon](https://github.com/MohammedZomlot2007/Tradeon)
-- **Application entry point:** `/` renders the Inertia `Landing` page; authenticated users are redirected to `/feed` (see `routes/web.php`).
-- **Important deployment distinction:** GitHub Pages hosts only the static introduction page. It does not run Laravel, PHP, database queries, authentication, Reverb, queues, or Paddle webhooks. No public full-stack production URL was verified during this review.
 
-The static GitHub Pages page is a product overview, not an interactive application demo. Screenshots of authenticated screens should be captured from a running application with safe sample data; do not use the GitHub Pages introduction as proof of logged-in product flows.
+**Static project overview:** [Open the GitHub Pages introduction](https://mohammedzomlot2007.github.io/Tradeon/) · **[Full source repository](https://github.com/MohammedZomlot2007/Tradeon)**
+
+The GitHub Pages deployment is a static introduction only. It does not run Laravel, PHP, database queries, authentication, Reverb, queues, or Paddle webhooks. No full-stack production URL was verified as part of the 2026-10-18 review. The `/` route in the Laravel app renders the Inertia `Landing` page, and authenticated users are redirected to `/feed` (see `routes/web.php`).
+
+### Visual product tour
+
+> **Integrity note:** the SVGs below are illustrative UI concepts with fictional sample content. They are not screenshots captured from a running deployment and do not prove the corresponding screens are live.
+
+![Tradeon business feed UI concept](docs/screenshots/tradeon-feed-concept.svg)
+
+![Tradeon requests and RFQ list UI concept](docs/screenshots/tradeon-rfq-concept.svg)
+
+![Tradeon messenger UI concept](docs/screenshots/tradeon-messenger-concept.svg)
+
+![Tradeon architecture diagram](docs/architecture.svg)
+
+Read the [architecture notes](docs/ARCHITECTURE.md), [verification record](docs/VERIFICATION.md), or [production runbook](deploy/production-runbook.md) for source paths and release steps.
 
 ### Architecture
 ```text

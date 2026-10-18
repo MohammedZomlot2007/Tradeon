@@ -31,12 +31,13 @@ php artisan tradeon:admin --name="Full Name" --username="handle" --email="admin@
 Required PHP extensions: `mbstring`, `gd`, `sqlite3/pdo_sqlite` (local), plus
 `redis` and `pdo_mysql` on production.
 
-## 2. Verified state
+## 2. Verification evidence and current release gate
 
-- Pest suite: **114 tests, 340 assertions — all passing** (`php artisan test`)
-- Frontend production build: passing (`npm run build`)
-- No secrets in this repo: `.env`, `*.sqlite`, logs, uploads and `vendor/` /
-  `node_modules/` are git-ignored. Copy `.env.example` → `.env` and fill values.
+- This handover's earlier verification record reported **114 Pest tests / 340 assertions passing** and a passing frontend production build. Treat those as historical results until rerun against the current commit.
+- The later `FINAL_AUDIT_REPORT.md` records 137/137 PHP syntax files passing and 53 unique named routes, but explicitly says the full `php artisan test` suite and `npm run build` were not executed during that audit because `vendor/` and `node_modules/` were absent.
+- The GitHub Actions run for Pages completed successfully on 2026-10-10. It validates the static introduction page only, not the Laravel application.
+- No full-stack production URL or end-to-end deployment check was verified in the 2026-10-18 review. Use [`docs/VERIFICATION.md`](docs/VERIFICATION.md) as the current evidence ledger and rerun the release commands before claiming current test/build success.
+- No secrets in this repo: `.env`, `*.sqlite`, logs, uploads and `vendor/` / `node_modules/` are git-ignored. Copy `.env.example` → `.env` and fill values locally.
 
 ## 3. Key business rules delivered
 
