@@ -68,3 +68,10 @@ Full runbook: `deploy/production-runbook.md` (+ `deploy/nginx.tradeon.conf`,
 
 Docs: `README.md` (setup + troubleshooting) · `BILLING_SETUP.md` (Paddle) ·
 `FINAL_AUDIT_REPORT.md` (last audit).
+
+
+## 5. Reproducible validation workflow
+
+The repository now includes `.github/workflows/application-verification.yml`, which installs dependencies, builds the frontend, runs the Laravel/Pest suite and `php artisan tradeon:smoke`, then attempts browser screenshots from a locally running app using synthetic CI-only company/post data. Review its latest workflow run rather than treating historical test counts as current verification. Download the `tradeon-verification-<run number>` artifact for build/test logs and PNG screenshots.
+
+CI uses a newly generated untracked `.env` from `.env.example`, an ephemeral application key and SQLite. It does not read a developer's machine-local `.env`, use Paddle secrets or connect to a production database. Never commit `.env` or `.env.production`.

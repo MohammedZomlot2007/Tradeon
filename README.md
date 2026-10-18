@@ -94,6 +94,15 @@ Open `http://127.0.0.1:8000`. Configure the values documented in `.env.example` 
 
 ---
 
+## Reproducible build, tests and browser screenshots
+
+The [application-verification workflow](https://github.com/MohammedZomlot2007/Tradeon/actions/workflows/application-verification.yml) runs Composer/npm installation, `npm run build`, `php artisan test`, `php artisan tradeon:smoke`, and Playwright browser captures against a disposable local SQLite database. It creates a synthetic test account, company, and sample post only inside the CI runner. Logs and genuine rendered screenshots are uploaded as a 30-day GitHub Actions artifact.
+
+- [Workflow runs](https://github.com/MohammedZomlot2007/Tradeon/actions/workflows/application-verification.yml)
+- [CI and screenshot guide](docs/CI-VERIFICATION.md)
+
+The workflow copies `.env.example` to an ephemeral untracked `.env`. It does not need production credentials or Paddle secrets. A real local `.env` is not present in this public repository and should never be committed.
+
 ## Local setup
 
 ```bash

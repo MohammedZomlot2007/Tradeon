@@ -1,0 +1,138 @@
+name: Laravel build, tests and browser screenshots
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build, test and capture app screens
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      APP_ENV: local
+      APP_DEBUG: "false"
+      APP_URL: http://127.0.0.1:8000
+      APP_FORCE_HTTPS: "false"
+      DB_CONNECTION: sqlite
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      BROADCAST_CONNECTION: log
+      BILLING_PROVIDER: paddle
+      PADDLE_ENV: sandbox
+      REVERB_HOST: 127.0.0.1
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      REVERB_ALLOWED_ORIGINS: "127.0.0.1,localhost"
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: bcmath, curl, fileinfo, gd, intl, mbstring, pdo_sqlite, redis, sqlite3, xml, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Create isolated environment
+        run: |
+          cp .env.example .env
+          mkdir -p database artifacts
+          touch database/database.sqlite
+          echo "Created a fresh local .env from .env.example; no production secrets are used."
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Generate ephemeral application key
+        run: php artisan key:generate --force
+
+      - name: Install JavaScript dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build frontend assets
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee artifacts/vite-build.log
+
+      - name: Migrate the disposable SQLite database
+        run: php artisan migrate:fresh --force
+
+      - name: Seed billing plans only
+        run: php artisan db:seed --force
+
+      - name: Create public storage link
+        run: php artisan storage:link
+
+      - name: Run Laravel / Pest tests
+        shell: bash
+        env:
+          APP_ENV: testing
+          DB_DATABASE: ":memory:"
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+          BROADCAST_CONNECTION: null
+        run: |
+          set -o pipefail
+          php artisan test --no-interaction 2>&1 | tee artifacts/phpunit.log
+
+      - name: Run application smoke checks
+        shell: bash
+        run: |
+          set -o pipefail
+          php artisan tradeon:smoke 2>&1 | tee artifacts/smoke.log
+
+      - name: Install Playwright for one-run browser capture
+        run: npm install --no-save --package-lock=false --legacy-peer-deps playwright
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start the local Laravel test server
+        shell: bash
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > artifacts/laravel-server.log 2>&1 &
+          echo $! > artifacts/laravel-server.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8000/login > /dev/null; then
+              echo "Laravel test server is responding."
+              exit 0
+            fi
+            sleep 2
+          done
+          cat artifacts/laravel-server.log
+          exit 1
+
+      - name: Capture real screenshots from the running application
+        env:
+          BASE_URL: http://127.0.0.1:8000
+          SCREENSHOT_DIR: artifacts/screenshots
+        run: node scripts/capture-smoke-screenshots.mjs
+
+      - name: Upload build, test logs and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradeon-verification-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 30
