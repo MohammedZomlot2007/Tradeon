@@ -57,10 +57,12 @@ try {
   await page.locator('#password').fill('Tradeon-CI-Demo-2026!');
   await page.locator('#password_confirmation').fill('Tradeon-CI-Demo-2026!');
 
-  await Promise.all([
-    page.waitForURL((url) => url.pathname.endsWith('/onboarding/company'), { timeout: 30_000 }),
-    page.locator('form button[type="submit"]').click(),
-  ]);
+  await page.locator('form button[type="submit"]').click();
+  await page.waitForFunction(
+    () => window.location.pathname.endsWith('/onboarding/company'),
+    null,
+    { timeout: 30_000 },
+  );
   await page.waitForTimeout(500);
   await page.screenshot({
     path: path.join(outputDir, '06-company-onboarding-desktop.png'),
@@ -73,10 +75,12 @@ try {
   await page.locator('#country').fill('United States');
   await page.locator('#city').fill('Austin');
   await page.locator('#description').fill('Synthetic company record created only in the disposable CI database to verify onboarding and the business feed interface.');
-  await Promise.all([
-    page.waitForURL((url) => !url.pathname.endsWith('/onboarding/company'), { timeout: 30_000 }),
-    page.locator('form button[type="submit"]').click(),
-  ]);
+  await page.locator('form button[type="submit"]').click();
+  await page.waitForFunction(
+    () => !window.location.pathname.endsWith('/onboarding/company'),
+    null,
+    { timeout: 30_000 },
+  );
 
   await page.goto(new URL('/feed', baseURL).toString(), { waitUntil: 'domcontentloaded', timeout: 45_000 });
   assert.ok(new URL(page.url()).pathname.endsWith('/feed'), `Expected authenticated feed, landed on ${page.url()}`);
