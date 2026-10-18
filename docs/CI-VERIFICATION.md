@@ -1,6 +1,6 @@
 # CI application verification and screenshots
 
-The workflow [Application verification](../.github/workflows/application-verification.yml) creates an isolated local `.env` from `.env.example`, generates a temporary Laravel key, uses a disposable SQLite database, installs dependencies, builds the React/Vite frontend, runs the Laravel/Pest suite, and executes `php artisan tradeon:smoke`.
+The workflow [Application verification](../.github/workflows/application-verification.yml) creates an isolated local `.env` from `.env.example`, generates a temporary Laravel key, uses a disposable SQLite database, installs dependencies on PHP 8.4 (required by the current locked development dependencies), builds the React/Vite frontend, runs the Laravel/Pest suite, and executes `php artisan tradeon:smoke`.
 
 When those steps succeed, Playwright starts a headless Chromium browser against the local Laravel server. It captures the real rendered Landing, Login, Register, Explore and Pricing pages, then creates a synthetic test account and company through the registration/onboarding forms, publishes a fictional feed post, and captures the feed, requests and billing screens at desktop/mobile widths.
 
